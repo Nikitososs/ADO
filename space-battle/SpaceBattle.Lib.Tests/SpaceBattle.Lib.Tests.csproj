@@ -20,4 +20,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SpaceBattle.Lib\SpaceBattle.Lib.csproj" />
+  </ItemGroup>
+
 </Project>
