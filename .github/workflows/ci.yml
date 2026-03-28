@@ -66,4 +66,3 @@ jobs:
         with:
           recreate: true
           path: space-battle/coverage-comment.md
-          
