@@ -1,0 +1,69 @@
+name: CI with Coverage Check
+
+on:
+  pull_request:
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: space-battle
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Check formatting
+        run: dotnet format --verify-no-changes
+
+      - name: Restore & Build & Test
+        run: |
+          dotnet restore
+          dotnet build --configuration Release --no-restore
+          dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory coverage --nologo
+
+      - name: Install ReportGenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+
+      - name: Generate Coverage Report
+        run: |
+          if [ ! -d "coverage" ] || [ -z "$(find coverage -name "*.xml" 2>/dev/null)" ]; then
+            echo "COVERAGE=0" >> $GITHUB_ENV
+            echo "### Coverage Report" > coverage-comment.md
+            echo "No tests found. Coverage check skipped." >> coverage-comment.md
+            exit 0
+          fi
+
+          reportgenerator "-reports:coverage/**/coverage.cobertura.xml" "-targetdir:coveragereport" "-reporttypes:TextSummary"
+
+          COVERAGE=$(grep -oP '(?<=Line coverage: )\d+(\.\d+)?' coveragereport/Summary.txt || echo "0")
+          echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
+
+          echo "### Coverage Report" > coverage-comment.md
+          echo "**Line coverage:** $COVERAGE%" >> coverage-comment.md
+
+          if (( $(echo "$COVERAGE > 0" | bc -l) )) && (( $(echo "$COVERAGE < 90" | bc -l) )); then
+            echo "❌ **Coverage is below 90%!**" >> coverage-comment.md
+            exit 1
+          elif (( $(echo "$COVERAGE >= 90" | bc -l) )); then
+            echo "✅ **Coverage >90%**" >> coverage-comment.md
+          else
+            echo "Tests executed but no coverage data found." >> coverage-comment.md
+          fi
+
+      - name: Add Coverage Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: always()
+        with:
+          recreate: true
+          path: space-battle/coverage-comment.md
+          
