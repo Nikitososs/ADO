@@ -5,7 +5,7 @@ namespace SpaceBattle.lib;
 
 public class Vector
 {
-    public int[] Coordinates { get; }
+    private int[] Coordinates { get; }
 
     public Vector(params int[] coordinates)
     {
