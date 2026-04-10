@@ -10,7 +10,7 @@ public class RegisterIoCDependencyMoveCommand : ICommand
         Ioc.Resolve<App.ICommand>(
             "IoC.Register",
             "Commands.Move",
-            (object[] args) => 
+            (object[] args) =>
             {
                 var obj = args[0];
 

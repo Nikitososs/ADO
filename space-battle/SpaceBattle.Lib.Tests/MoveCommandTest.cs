@@ -68,14 +68,14 @@ public class RegisterIoCDependencyMoveCommandTest
         moving.SetupGet(m => m.Velocity).Returns(new Vector([-4, 1]));
 
         Ioc.Resolve<App.ICommand>(
-            "IoC.Register", 
-            "Adapters.IMovingObject", 
+            "IoC.Register",
+            "Adapters.IMovingObject",
             (object[] args) => moving.Object
         ).Execute();
 
         new RegisterIoCDependencyMoveCommand().Execute();
         var move = Ioc.Resolve<SpaceBattle.lib.ICommand>("Commands.Move", new object());
-        
+
         move.Execute();
 
         moving.VerifySet(m => m.Position = new Vector([8, 6]), Times.Once);
