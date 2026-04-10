@@ -69,4 +69,15 @@ public class AngleTests
 
         Assert.NotEqual(0, hashCode);
     }
+
+    [Fact]
+    public void Angle_ImplicitConversionToDouble_ReturnsCorrectRadians()
+    {
+        var angle = new Angle(2);
+
+        double radians = angle;
+        double expected = 2 * Math.PI * 2 / 8;
+
+        Assert.Equal(expected, radians);
+    }
 }
