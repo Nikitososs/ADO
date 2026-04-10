@@ -41,7 +41,7 @@ public class RegisterIoCDependencySendCommandTest
     }
 
     [Fact]
-    public void General()
+    public void SendCommandGeneral()
     {
         var cmd = new Mock<SpaceBattle.lib.ICommand>();
         var receiver = new Mock<ICommandReceiver>();
