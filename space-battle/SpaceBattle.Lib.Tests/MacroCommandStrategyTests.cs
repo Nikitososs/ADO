@@ -20,7 +20,7 @@ public class CreateMacroCommandStrategyTests
         var cmd1 = new Mock<SpaceBattle.lib.ICommand>();
         var cmd2 = new Mock<SpaceBattle.lib.ICommand>();
 
-        Ioc.Resolve<App.ICommand>("IoC.Register", "Specs.Test", (object[] args) => 
+        Ioc.Resolve<App.ICommand>("IoC.Register", "Specs.Test", (object[] args) =>
             new List<string> { "Command.Move", "Command.Rotate" }
         ).Execute();
 
@@ -39,7 +39,7 @@ public class CreateMacroCommandStrategyTests
     [Fact]
     public void Resolve_MissingCommandDependency_ThrowsException()
     {
-        Ioc.Resolve<App.ICommand>("IoC.Register", "Specs.Invalid", (object[] args) => 
+        Ioc.Resolve<App.ICommand>("IoC.Register", "Specs.Invalid", (object[] args) =>
             new List<string> { "Wrong.Cmd" }
         ).Execute();
 
