@@ -76,8 +76,42 @@ public class AngleTests
         var angle = new Angle(2);
 
         double radians = angle;
-        double expected = 2 * Math.PI * 2 / 8;
+        double expected = 2 * System.Math.PI * 2 / 8;
 
         Assert.Equal(expected, radians);
+    }
+
+    [Fact]
+    public void Angle_Equals_WithNull_ReturnsFalse()
+    {
+        var angle = new Angle(5);
+
+        var result = angle.Equals(null);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void Angle_Equals_WithDifferentType_ReturnsFalse()
+    {
+        var angle = new Angle(5);
+
+        var result = angle.Equals("string");
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void Angle_OperatorEquals_WithNull_HandlesCorrectly()
+    {
+        var a = new Angle(5);
+        Angle? b = null;
+
+        Assert.False(a == b!);
+        Assert.False(b! == a);
+
+        Angle? c = null;
+        Angle? d = null;
+        Assert.True(c == d);
     }
 }
