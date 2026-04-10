@@ -14,7 +14,7 @@ public class MacroCommandTest
         var cmd2 = new Mock<SpaceBattle.lib.ICommand>();
         var cmd3 = new Mock<SpaceBattle.lib.ICommand>();
 
-        SpaceBattle.lib.ICommand macro = new MacroCommand([cmd1.Object, cmd2.Object, cmd3.Object]);
+        var macro = new MacroCommand([cmd1.Object, cmd2.Object, cmd3.Object]);
 
         macro.Execute();
 
@@ -31,7 +31,7 @@ public class MacroCommandTest
         cmd2.Setup(cmd => cmd.Execute()).Throws<Exception>();
         var cmd3 = new Mock<SpaceBattle.lib.ICommand>();
 
-        SpaceBattle.lib.ICommand macro = new MacroCommand([cmd1.Object, cmd2.Object, cmd3.Object]);
+        var macro = new MacroCommand([cmd1.Object, cmd2.Object, cmd3.Object]);
 
         Assert.Throws<Exception>(() => macro.Execute());
 
@@ -41,9 +41,9 @@ public class MacroCommandTest
     }
 }
 
-public class RegisterIoCDependencySendCommandTest
+public class RegisterIoCDependencyMacroCommandTest
 {
-    public RegisterIoCDependencySendCommandTest()
+    public RegisterIoCDependencyMacroCommandTest()
     {
         new InitCommand().Execute();
         var iocScope = Ioc.Resolve<object>("IoC.Scope.Create");
