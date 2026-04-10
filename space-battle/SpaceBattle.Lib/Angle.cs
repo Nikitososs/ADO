@@ -1,4 +1,5 @@
-namespace SpaceBattle.Lib;
+
+namespace SpaceBattle.lib;
 
 public class Angle
 {

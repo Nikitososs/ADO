@@ -1,4 +1,5 @@
-using SpaceBattle.Lib;
+
+using SpaceBattle.lib;
 using Xunit;
 
 namespace SpaceBattle.Tests;
