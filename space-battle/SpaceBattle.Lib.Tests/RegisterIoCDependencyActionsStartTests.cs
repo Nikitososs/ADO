@@ -63,4 +63,28 @@ public class RegisterIoCDependencyActionsStartTests
         operation.Verify(op => op.Execute(), Times.Once);
         receiver.Verify(r => r.Receive(It.Is<SpaceBattle.lib.ICommand>(c => ReferenceEquals(c, startCommand))), Times.Once);
     }
+
+    [Fact]
+    public void Execute_ShouldPutStartCommandInActiveOperationsByTarget()
+    {
+        var operation = new Mock<SpaceBattle.lib.ICommand>();
+        var receiver = new Mock<SpaceBattle.lib.ICommandReceiver>();
+        var targetObject = new object();
+
+        Ioc.Resolve<App.ICommand>("IoC.Register", "Move", (object[] args) => operation.Object).Execute();
+        new SpaceBattle.lib.RegisterIoCDependencyActionsStart().Execute();
+        var activeOperations = Ioc.Resolve<IDictionary<object, SpaceBattle.lib.ICommand>>("Actions.ActiveOperations");
+
+        IDictionary<string, object> order = new Dictionary<string, object>
+        {
+            { "target", targetObject },
+            { "command", "Move" },
+            { "receiver", receiver.Object },
+        };
+
+        var startCommand = Ioc.Resolve<SpaceBattle.lib.ICommand>("Actions.Start", order);
+
+        Assert.True(activeOperations.TryGetValue(targetObject, out var activeCommand));
+        Assert.Same(startCommand, activeCommand);
+    }
 }

@@ -10,6 +10,7 @@ public class RegisterIoCDependencyActionsStart : SpaceBattle.lib.ICommand
     {
         new RegisterIoCDependencyMacroCommand().Execute();
         new RegisterIoCDependencySendCommand().Execute();
+        new RegisterIoCDependencyActionsActiveOperations().Execute();
 
         Ioc.Resolve<App.ICommand>("IoC.Register", "Actions.StartCommand", (object[] args) =>
         {
@@ -23,8 +24,11 @@ public class RegisterIoCDependencyActionsStart : SpaceBattle.lib.ICommand
             var command = (string)order["command"];
             var receiver = (ICommandReceiver)order["receiver"];
             var longRunningOperation = Ioc.Resolve<SpaceBattle.lib.ICommand>(command, target);
+            var activeOperations = Ioc.Resolve<IDictionary<object, SpaceBattle.lib.ICommand>>("Actions.ActiveOperations");
+            var startCommand = Ioc.Resolve<SpaceBattle.lib.ICommand>("Actions.StartCommand", longRunningOperation, receiver);
 
-            return Ioc.Resolve<SpaceBattle.lib.ICommand>("Actions.StartCommand", longRunningOperation, receiver);
+            activeOperations[target] = startCommand;
+            return startCommand;
         }).Execute();
     }
 }
