@@ -1,17 +1,21 @@
 
+using System.Collections.Generic;
+
 namespace SpaceBattle.lib;
 
 public class ActionStopCommand : SpaceBattle.lib.ICommand
 {
+    private readonly IDictionary<object, ICommand> _activeOperations;
     private readonly object _target;
 
-    public ActionStopCommand(params object[] args)
+    public ActionStopCommand(IDictionary<object, ICommand> activeOperations, object target)
     {
-        _target = args[0];
+        _activeOperations = activeOperations;
+        _target = target;
     }
 
     public void Execute()
     {
-
+        _activeOperations.Remove(_target);
     }
 }
