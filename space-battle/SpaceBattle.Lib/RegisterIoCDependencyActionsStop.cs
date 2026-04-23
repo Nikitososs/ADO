@@ -8,6 +8,8 @@ public class RegisterIoCDependencyActionsStop : SpaceBattle.lib.ICommand
 {
     public void Execute()
     {
+        new RegisterIoCDependencyActionsActiveOperations().Execute();
+
         Ioc.Resolve<App.ICommand>("IoC.Register", "Actions.StopCommand", (object[] args) =>
         {
             return new ActionStopCommand(
