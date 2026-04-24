@@ -55,6 +55,7 @@ public class RegisterIoCDependencyGameTests
     [Fact]
     public void E2E_Step_AfterFire_MovesNewTorpedo()
     {
+        new RegisterIoCDependencyFireAuthorizer().Execute();
         new RegisterIoCDependencyFireCommand().Execute();
         new RegisterIoCDependencyMoveTorpedoesCommand().Execute();
         new RegisterIoCDependencySimulationStep().Execute();

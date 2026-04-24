@@ -29,11 +29,13 @@ public class RegisterIoCDependencyFireCommand : ICommand
             (object[] args) =>
             {
                 var ship = (IShip)args[0];
+                var accessToken = args.Length > 1 ? (string)args[1] : null;
                 var torpedoFactory = Ioc.Resolve<ITorpedoFactory>("Factories.TorpedoFactory");
                 var gameObjectRepository = Ioc.Resolve<IGameObjectRepository>("Repositories.GameObjects");
                 var fireRules = Ioc.Resolve<IEnumerable<IFireRule>>("Rules.Fire");
-
-                return new FireCommand(torpedoFactory, gameObjectRepository, ship, fireRules);
+                var authorizer = Ioc.Resolve<IFireAuthorizer>("Authorizers.Fire");
+                var fire = new FireCommand(torpedoFactory, gameObjectRepository, ship, fireRules);
+                return new AuthorizedFireCommand(fire, authorizer, ship, accessToken);
             }
         ).Execute();
     }
