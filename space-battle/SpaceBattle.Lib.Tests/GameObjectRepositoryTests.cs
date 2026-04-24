@@ -9,16 +9,16 @@ public class GameObjectRepositoryTests
     public void Repository_AddTryGetRemove_WorksCorrectly()
     {
         IGameObjectRepository repository = new GameObjectRepository();
-        var ship = new Mock<IShip>();
+        var gameObject = new Mock<IGameObject>();
         var id = "ship-1";
 
-        repository.Add(id, ship.Object);
+        repository.Add(id, gameObject.Object);
         var canRead = repository.TryGet(id, out var fromRepository);
         var wasRemoved = repository.Remove(id);
         var existsAfterRemove = repository.TryGet(id, out _);
 
         Assert.True(canRead);
-        Assert.Same(ship.Object, fromRepository);
+        Assert.Same(gameObject.Object, fromRepository);
         Assert.True(wasRemoved);
         Assert.False(existsAfterRemove);
     }
