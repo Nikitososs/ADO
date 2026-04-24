@@ -7,4 +7,5 @@ public interface IGameObjectRepository
     void Add(string id, IGameObject gameObject);
     bool TryGet(string id, out IGameObject gameObject);
     bool Remove(string id);
+    IReadOnlyCollection<IGameObject> GetAll();
 }

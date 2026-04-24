@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SpaceBattle.lib;
-
 public class GameObjectRepository : IGameObjectRepository
 {
     private readonly Dictionary<string, IGameObject> _gameObjects = new();
@@ -19,5 +19,10 @@ public class GameObjectRepository : IGameObjectRepository
     public bool Remove(string id)
     {
         return _gameObjects.Remove(id);
+    }
+
+    public IReadOnlyCollection<IGameObject> GetAll()
+    {
+        return _gameObjects.Values.ToList();
     }
 }

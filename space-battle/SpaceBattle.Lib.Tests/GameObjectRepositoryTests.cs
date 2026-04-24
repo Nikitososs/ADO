@@ -22,6 +22,22 @@ public class GameObjectRepositoryTests
         Assert.True(wasRemoved);
         Assert.False(existsAfterRemove);
     }
+
+    [Fact]
+    public void Repository_GetAll_ReturnsAllStoredObjects()
+    {
+        IGameObjectRepository repository = new GameObjectRepository();
+        var first = new Mock<IGameObject>();
+        var second = new Mock<IGameObject>();
+        repository.Add("a", first.Object);
+        repository.Add("b", second.Object);
+
+        var all = repository.GetAll();
+
+        Assert.Equal(2, all.Count);
+        Assert.Contains(first.Object, all);
+        Assert.Contains(second.Object, all);
+    }
 }
 
 public class RegisterIoCDependencyGameObjectRepositoryTest
