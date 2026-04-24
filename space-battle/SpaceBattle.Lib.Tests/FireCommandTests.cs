@@ -42,6 +42,7 @@ public class RegisterIoCDependencyFireCommandTests
         new InitCommand().Execute();
         var iocScope = Ioc.Resolve<object>("IoC.Scope.Create");
         Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", iocScope).Execute();
+        new RegisterIoCDependencyFireAuthorizer().Execute();
     }
 
     [Fact]
@@ -52,7 +53,7 @@ public class RegisterIoCDependencyFireCommandTests
         var fire = Ioc.Resolve<SpaceBattle.lib.ICommand>("Commands.Fire", ship.Object);
 
         Assert.NotNull(fire);
-        Assert.IsType<FireCommand>(fire);
+        Assert.IsType<AuthorizedFireCommand>(fire);
         fire.Execute();
     }
 }
