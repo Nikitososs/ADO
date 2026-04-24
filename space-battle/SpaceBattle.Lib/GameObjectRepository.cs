@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace SpaceBattle.lib;
+
 public class GameObjectRepository : IGameObjectRepository
 {
     private readonly Dictionary<string, IGameObject> _gameObjects = new();
