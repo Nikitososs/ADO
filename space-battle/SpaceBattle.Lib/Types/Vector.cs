@@ -12,6 +12,8 @@ public class Vector
         Coordinates = coordinates;
     }
 
+    public Vector Clone() => new Vector(Coordinates);
+
     public static Vector operator +(Vector a, Vector b)
     {
         if (a.Coordinates.Length != b.Coordinates.Length)
