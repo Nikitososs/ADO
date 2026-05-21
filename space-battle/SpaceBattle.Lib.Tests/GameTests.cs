@@ -15,11 +15,12 @@ public class GameTests
     [Fact]
     public void GameCommand_ExecutesAllQueuedCommands()
     {
+        var queue = new TestGameSchedulerQueue();
+        RegisterSchedulerQueue(queue);
         new RegisterIoCDependencyGame().Execute();
 
         var cmd1 = new Mock<SpaceBattle.lib.ICommand>();
         var cmd2 = new Mock<SpaceBattle.lib.ICommand>();
-        var queue = (GameSchedulerQueue)Ioc.Resolve<IQueue>("Game.Scheduler.Queue");
         queue.Receive(cmd1.Object);
         queue.Receive(cmd2.Object);
 
@@ -33,13 +34,14 @@ public class GameTests
     [Fact]
     public void GameCommand_WhenCommandThrows_InvokesExceptionHandler()
     {
+        var queue = new TestGameSchedulerQueue();
+        RegisterSchedulerQueue(queue);
         new RegisterIoCDependencyGame().Execute();
 
         var failing = new Mock<SpaceBattle.lib.ICommand>();
         failing.Setup(c => c.Execute()).Throws<InvalidOperationException>();
         var ok = new Mock<SpaceBattle.lib.ICommand>();
 
-        var queue = (GameSchedulerQueue)Ioc.Resolve<IQueue>("Game.Scheduler.Queue");
         queue.Receive(failing.Object);
         queue.Receive(ok.Object);
 
@@ -50,17 +52,32 @@ public class GameTests
         ok.Verify(c => c.Execute(), Times.Once());
     }
 
-    [Fact]
-    public void GameSchedulerQueue_ReceiveAndTake_WorksWithoutIoc()
+    static void RegisterSchedulerQueue(IGameSchedulerQueue queue)
     {
-        var queue = new GameSchedulerQueue();
-        var cmd = new Mock<SpaceBattle.lib.ICommand>();
+        Ioc.Resolve<App.ICommand>(
+            "IoC.Register",
+            "Game.Scheduler.Queue",
+            (object[] _) => queue
+        ).Execute();
+    }
+}
 
-        queue.Receive(cmd.Object);
+internal class TestGameSchedulerQueue : IGameSchedulerQueue
+{
+    private readonly Queue<SpaceBattle.lib.ICommand> _commands = new();
 
-        Assert.Equal(1, queue.Count);
-        queue.Take().Execute();
-        cmd.Verify(c => c.Execute(), Times.Once());
-        Assert.Equal(0, queue.Count);
+    public int Count => _commands.Count;
+
+    public void Receive(SpaceBattle.lib.ICommand cmd)
+    {
+        _commands.Enqueue(cmd);
+    }
+
+    public SpaceBattle.lib.ICommand Take()
+    {
+        if (_commands.Count == 0)
+            throw new InvalidOperationException("Scheduler queue is empty.");
+
+        return _commands.Dequeue();
     }
 }

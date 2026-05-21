@@ -7,19 +7,12 @@ public class RegisterIoCDependencyGame : ICommand
 {
     public void Execute()
     {
-        var queue = new GameSchedulerQueue();
         var state = new SchedulerState();
 
         Ioc.Resolve<App.ICommand>(
             "IoC.Register",
-            "Game.Scheduler.Queue",
-            (object[] _) => queue
-        ).Execute();
-
-        Ioc.Resolve<App.ICommand>(
-            "IoC.Register",
             "Game.Scheduler.Take",
-            (object[] _) => queue.Take()
+            (object[] _) => Ioc.Resolve<IGameSchedulerQueue>("Game.Scheduler.Queue").Take()
         ).Execute();
 
         Ioc.Resolve<App.ICommand>(
@@ -43,7 +36,7 @@ public class RegisterIoCDependencyGame : ICommand
         Ioc.Resolve<App.ICommand>(
             "IoC.Register",
             "Game.Scheduler.CanContinue",
-            (object[] _) => (object)(queue.Count > 0)
+            (object[] _) => (object)(Ioc.Resolve<IGameSchedulerQueue>("Game.Scheduler.Queue").Count > 0)
         ).Execute();
 
         Ioc.Resolve<App.ICommand>(
