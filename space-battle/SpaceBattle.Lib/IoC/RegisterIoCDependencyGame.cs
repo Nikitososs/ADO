@@ -60,7 +60,7 @@ public class RegisterIoCDependencyGame : ICommand
         Ioc.Resolve<App.ICommand>(
             "IoC.Register",
             "ExceptionHandler.Handle",
-            (object[] args) => new ExceptionHandlerCommand((ICommand)args[0], (Exception)args[1])
+            (object[] _) => new ExceptionHandler()
         ).Execute();
 
         Ioc.Resolve<App.ICommand>(
@@ -68,5 +68,12 @@ public class RegisterIoCDependencyGame : ICommand
             "Commands.Game",
             (object[] args) => new GameCommand(args[0])
         ).Execute();
+    }
+
+    private sealed class ExceptionHandler : ICommand
+    {
+        public void Execute()
+        {
+        }
     }
 }
