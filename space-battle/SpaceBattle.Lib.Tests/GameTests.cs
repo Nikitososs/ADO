@@ -17,6 +17,7 @@ public class GameTests
     {
         var queue = new TestGameSchedulerQueue();
         RegisterSchedulerQueue(queue);
+        RegisterExceptionHandler(new TestExceptionHandler());
         new RegisterIoCDependencyGame().Execute();
 
         var cmd1 = new Mock<SpaceBattle.lib.ICommand>();
@@ -35,7 +36,9 @@ public class GameTests
     public void GameCommand_WhenCommandThrows_InvokesExceptionHandler()
     {
         var queue = new TestGameSchedulerQueue();
+        var handler = new Mock<IExceptionHandler>();
         RegisterSchedulerQueue(queue);
+        RegisterExceptionHandler(handler.Object);
         new RegisterIoCDependencyGame().Execute();
 
         var failing = new Mock<SpaceBattle.lib.ICommand>();
@@ -50,6 +53,9 @@ public class GameTests
 
         failing.Verify(c => c.Execute(), Times.Once());
         ok.Verify(c => c.Execute(), Times.Once());
+        handler.Verify(
+            h => h.Handle(failing.Object, It.IsAny<InvalidOperationException>()),
+            Times.Once());
     }
 
     static void RegisterSchedulerQueue(IGameSchedulerQueue queue)
@@ -59,6 +65,22 @@ public class GameTests
             "Game.Scheduler.Queue",
             (object[] _) => queue
         ).Execute();
+    }
+
+    static void RegisterExceptionHandler(IExceptionHandler handler)
+    {
+        Ioc.Resolve<App.ICommand>(
+            "IoC.Register",
+            "ExceptionHandler.Handler",
+            (object[] _) => handler
+        ).Execute();
+    }
+}
+
+internal class TestExceptionHandler : IExceptionHandler
+{
+    public void Handle(SpaceBattle.lib.ICommand failedCommand, Exception exception)
+    {
     }
 }
 

@@ -20,7 +20,7 @@ public class GameCommand(object scope) : ICommand
             }
             catch (Exception e)
             {
-                Ioc.Resolve<ICommand>("ExceptionHandler.Handle", cmd, e).Execute();
+                Ioc.Resolve<IExceptionHandler>("ExceptionHandler.Handler").Handle(cmd, e);
             }
 
             Ioc.Resolve<ICommand>("Game.Scheduler.CurrentDate.Advance").Execute();
