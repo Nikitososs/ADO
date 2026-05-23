@@ -1,7 +1,9 @@
 
 namespace SpaceBattle.lib;
 
-public interface IGameSchedulerQueue : IQueue, ICommandReceiver, IGame
+public interface IGameSchedulerQueue : ICommandReceiver
 {
+    int Count { get; }
+
     ICommand Take();
 }

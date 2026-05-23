@@ -19,7 +19,7 @@ public class BeginGameQuantumCommand(SchedulerState state) : ICommand
 
     static bool CanContinueInProgress(SchedulerState state)
     {
-        var queue = Ioc.Resolve<IQueue>("Game.Scheduler.Queue");
+        var queue = Ioc.Resolve<IGameSchedulerQueue>("Game.Scheduler.Queue");
         return state.CurrentDate - state.StartDate < state.Quantum && queue.Count > 0;
     }
 }
