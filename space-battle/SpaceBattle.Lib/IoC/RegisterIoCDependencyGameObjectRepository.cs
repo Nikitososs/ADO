@@ -7,6 +7,14 @@ public class RegisterIoCDependencyGameObjectRepository : ICommand
 {
     public void Execute()
     {
+        var repository = new GameObjectRepository();
+
+        Ioc.Resolve<App.ICommand>(
+            "IoC.Register",
+            "Game.Registry.Repository",
+            (object[] _) => repository
+        ).Execute();
+
         Ioc.Resolve<App.ICommand>(
             "IoC.Register",
             "Game.Registry.Get",
