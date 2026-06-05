@@ -15,7 +15,7 @@ public class TorpedoFactoryTests
         var idGenerator = new Mock<IIdGenerator>();
         idGenerator.Setup(g => g.NewId()).Returns("torpedo-42");
 
-        var factory = new TorpedoFactory(idGenerator.Object);
+        var factory = new TorpedoFactory(idGenerator.Object, Mock.Of<ICollisionChecker>());
         var initialVelocity = new Vector(-5, 12);
 
         var torpedo = factory.Create(shooter.Object, initialVelocity);
@@ -33,7 +33,7 @@ public class TorpedoFactoryTests
         var shooter = new Mock<IShootable>();
         shooter.SetupGet(s => s.Position).Returns(position);
 
-        var factory = new TorpedoFactory(new GuidIdGenerator());
+        var factory = new TorpedoFactory(new GuidIdGenerator(), Mock.Of<ICollisionChecker>());
         var torpedo = (Torpedo)factory.Create(shooter.Object, new Vector(1, 0));
 
         torpedo.Position = new Vector(9, 9);
@@ -48,6 +48,13 @@ public class TorpedoFactoryTests
         var iocScope = Ioc.Resolve<object>("IoC.Scope.Create");
         Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", iocScope).Execute();
 
+        var path = Path.Combine(AppContext.BaseDirectory, "CollisionData", "point.txt");
+        Ioc.Resolve<App.ICommand>(
+            "IoC.Register",
+            "Collision.TorpedoProfile.Path",
+            (object[] _) => path
+        ).Execute();
+        new RegisterIoCDependencyCollision().Execute();
         new RegisterIoCDependencyTorpedo().Execute();
 
         var shooter = new Mock<IShootable>();

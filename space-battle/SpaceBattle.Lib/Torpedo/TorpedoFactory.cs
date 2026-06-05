@@ -1,7 +1,7 @@
 
 namespace SpaceBattle.lib;
 
-public class TorpedoFactory(IIdGenerator idGenerator) : ITorpedoFactory
+public class TorpedoFactory(IIdGenerator idGenerator, ICollisionChecker torpedoCollisionProfile) : ITorpedoFactory
 {
     public ITorpedo Create(IShootable shooter, Vector initialVelocity)
     {
@@ -9,6 +9,6 @@ public class TorpedoFactory(IIdGenerator idGenerator) : ITorpedoFactory
         ArgumentNullException.ThrowIfNull(initialVelocity);
 
         var id = idGenerator.NewId();
-        return new Torpedo(id, shooter.Position.Clone(), initialVelocity);
+        return new Torpedo(id, shooter.Position.Clone(), initialVelocity, torpedoCollisionProfile);
     }
 }

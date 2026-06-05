@@ -14,6 +14,17 @@ public class Vector
 
     public Vector Clone() => new Vector(Coordinates);
 
+    public int this[int index] => Coordinates[index];
+
+    public static Vector operator -(Vector a, Vector b)
+    {
+        if (a.Coordinates.Length != b.Coordinates.Length)
+            throw new ArgumentException("Векторы должны иметь одинаковую размерность.");
+
+        var result = a.Coordinates.Zip(b.Coordinates, (x, y) => x - y).ToArray();
+        return new Vector(result);
+    }
+
     public static Vector operator +(Vector a, Vector b)
     {
         if (a.Coordinates.Length != b.Coordinates.Length)

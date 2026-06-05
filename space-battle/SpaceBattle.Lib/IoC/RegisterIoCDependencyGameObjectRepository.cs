@@ -23,7 +23,9 @@ public class RegisterIoCDependencyGameObjectRepository : ICommand
             (object[] args) =>
             {
                 var repo = Ioc.Resolve<IGameObjectRepository>("Game.Registry.Repository");
-                return new GameRegistryCreateCommand(repo, (string)args[0], args[1]);
+                ISpatialIndex? spatialIndex = ResolveOptionalSpatialIndex();
+
+                return new GameRegistryCreateCommand(repo, (string)args[0], args[1], spatialIndex);
             }
         ).Execute();
 
@@ -33,8 +35,22 @@ public class RegisterIoCDependencyGameObjectRepository : ICommand
             (object[] args) =>
             {
                 var repo = Ioc.Resolve<IGameObjectRepository>("Game.Registry.Repository");
-                return new GameRegistryDeleteCommand(repo, (string)args[0]);
+                ISpatialIndex? spatialIndex = ResolveOptionalSpatialIndex();
+
+                return new GameRegistryDeleteCommand(repo, (string)args[0], spatialIndex);
             }
         ).Execute();
+    }
+
+    private static ISpatialIndex? ResolveOptionalSpatialIndex()
+    {
+        try
+        {
+            return Ioc.Resolve<ISpatialIndex>("Collision.SpatialIndex");
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 }

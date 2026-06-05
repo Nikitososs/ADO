@@ -19,7 +19,8 @@ public class RegisterIoCDependencyTorpedo : ICommand
             (object[] _) =>
             {
                 var idGenerator = Ioc.Resolve<IIdGenerator>("Generators.Id");
-                return new TorpedoFactory(idGenerator);
+                var torpedoProfile = Ioc.Resolve<ICollisionChecker>("Collision.TorpedoProfile");
+                return new TorpedoFactory(idGenerator, torpedoProfile);
             }
         ).Execute();
 

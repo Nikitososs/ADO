@@ -8,7 +8,7 @@ public class TorpedoMoveTests
     [Fact]
     public void MoveCommand_MovesTorpedoByVelocity()
     {
-        var torpedo = new Torpedo("t1", new Vector(0, 0), new Vector(-5, 12));
+        var torpedo = new Torpedo("t1", new Vector(0, 0), new Vector(-5, 12), Mock.Of<ICollisionChecker>());
         var move = new MoveCommand(torpedo);
 
         move.Execute();
@@ -26,7 +26,7 @@ public class TorpedoMoveTests
         new RegisterIoCDependencyTorpedo().Execute();
         new RegisterIoCDependencyMoveCommand().Execute();
 
-        var torpedo = new Torpedo("t1", new Vector(3, 4), new Vector(1, 2));
+        var torpedo = new Torpedo("t1", new Vector(3, 4), new Vector(1, 2), Mock.Of<ICollisionChecker>());
         var move = Ioc.Resolve<SpaceBattle.lib.ICommand>("Commands.Move", torpedo);
 
         move.Execute();
