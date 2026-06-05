@@ -7,6 +7,18 @@ public class CollisionTests
 {
     private static ICollisionChecker NoCollision => Mock.Of<ICollisionChecker>();
 
+    private static string TorpedoProfilePath =>
+        Path.Combine(AppContext.BaseDirectory, "CollisionData", "torpedo.txt");
+
+    private static string ShipProfilePath =>
+        Path.Combine(AppContext.BaseDirectory, "CollisionData", "ship.txt");
+
+    private static PrecomputedCollisionChecker LoadTorpedoProfile() =>
+        PrecomputedCollisionChecker.Load(TorpedoProfilePath);
+
+    private static PrecomputedCollisionChecker LoadShipProfile() =>
+        PrecomputedCollisionChecker.Load(ShipProfilePath);
+
     [Fact]
     public void PrecomputedCollisionChecker_LoadsPositiveEntries()
     {
@@ -33,6 +45,86 @@ public class CollisionTests
         {
             File.Delete(path);
         }
+    }
+
+    [Fact]
+    public void TorpedoProfile_LoadsGeneratedFile()
+    {
+        var profile = LoadTorpedoProfile();
+
+        Assert.True(File.ReadAllLines(TorpedoProfilePath).Length >= 500);
+        Assert.True(profile.Collides(-5, -5, 5, 5));
+        Assert.False(profile.Collides(99, 99, 0, 0));
+    }
+
+    [Fact]
+    public void ShipProfile_LoadsGeneratedFile()
+    {
+        var profile = LoadShipProfile();
+
+        Assert.True(File.ReadAllLines(ShipProfilePath).Length >= 2800);
+        Assert.True(profile.Collides(-6, -6, 5, 5));
+        Assert.False(profile.Collides(99, 99, 0, 0));
+    }
+
+    [Fact]
+    public void WillCollide_WithRealTorpedoProfile_UsesPointVsTorpedoEntry()
+    {
+        var ship = new Ship("ship", new Vector(0, 0), new Vector(0, 0), new Angle(0), LoadShipProfile());
+        var torpedo = new Torpedo("torpedo", new Vector(-5, -5), new Vector(5, 5), LoadTorpedoProfile());
+
+        Assert.True(PrecomputedCollisionChecker.WillCollide(ship, torpedo));
+    }
+
+    [Fact]
+    public void WillCollide_WithRealShipProfile_UsesPointVsShipEntry()
+    {
+        var torpedo = new Torpedo("torpedo", new Vector(0, 0), new Vector(0, 0), LoadTorpedoProfile());
+        var ship = new Ship("ship", new Vector(-6, -6), new Vector(5, 5), new Angle(0), LoadShipProfile());
+
+        Assert.True(PrecomputedCollisionChecker.WillCollide(torpedo, ship));
+    }
+
+    [Fact]
+    public void CheckCollisions_WithRealTorpedoProfile_ThrowsForRecordedCollision()
+    {
+        var repository = new DictionaryGameObjectRepository();
+        var spatialIndex = new UniformGridSpatialIndex();
+        var ship = new Ship("ship", new Vector(0, 0), new Vector(0, 0), new Angle(0), LoadShipProfile());
+        var torpedo = new Torpedo("torpedo", new Vector(-1, -1), new Vector(1, 1), LoadTorpedoProfile());
+
+        repository.Add("ship", ship);
+        repository.Add("torpedo", torpedo);
+        spatialIndex.Insert("ship", ship.Position);
+        spatialIndex.Insert("torpedo", torpedo.Position);
+
+        Assert.Throws<InvalidOperationException>(() =>
+            new CheckCollisionsCommand(ship, spatialIndex, repository).Execute());
+    }
+
+    [Fact]
+    public void TorpedoFactory_WithRealProfilePath_CreatesTorpedoWithLoadedChecker()
+    {
+        new InitCommand().Execute();
+        var iocScope = Ioc.Resolve<object>("IoC.Scope.Create");
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", iocScope).Execute();
+
+        Ioc.Resolve<App.ICommand>(
+            "IoC.Register",
+            "Collision.TorpedoProfile.Path",
+            (object[] _) => TorpedoProfilePath
+        ).Execute();
+        new RegisterIoCDependencyCollision().Execute();
+        new RegisterIoCDependencyTorpedo().Execute();
+
+        var shooter = new Mock<IShootable>();
+        shooter.SetupGet(s => s.Position).Returns(new Vector(0, 0));
+        shooter.SetupGet(s => s.Facing).Returns(new Angle(0));
+
+        var factory = Ioc.Resolve<ITorpedoFactory>("Torpedo.Factory");
+        var torpedo = (Torpedo)factory.Create(shooter.Object, new Vector(5, 5));
+
+        Assert.True(torpedo.CollisionChecker.Collides(-5, -5, 5, 5));
     }
 
     [Fact]
