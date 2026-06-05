@@ -23,7 +23,7 @@ public class FireCommandTests
         var authorizer = new Mock<IActionAuthorizer>();
         authorizer.Setup(a => a.CanPerform("user-1", "ship-1", FireCommand.FireAction)).Returns(true);
 
-        var torpedo = new Torpedo("torpedo-1", new Vector(0, 0), new Vector(-5, 12));
+        var torpedo = new Torpedo("torpedo-1", new Vector(0, 0), new Vector(-5, 12), Mock.Of<ICollisionChecker>());
         var factory = new Mock<ITorpedoFactory>();
         factory.Setup(f => f.Create(shooter.Object, It.IsAny<Vector>())).Returns(torpedo);
 
@@ -90,6 +90,14 @@ public class FireCommandTests
         new RegisterIoCDependencyActionAuthorizer().Execute();
         var authorizer = (PrefixTreeActionAuthorizer)Ioc.Resolve<IActionAuthorizer>("Authorization.Authorizer");
         authorizer.Grant("user-1", "ship-1", FireCommand.FireAction);
+
+        var path = Path.Combine(AppContext.BaseDirectory, "CollisionData", "point.txt");
+        Ioc.Resolve<App.ICommand>(
+            "IoC.Register",
+            "Collision.TorpedoProfile.Path",
+            (object[] _) => path
+        ).Execute();
+        new RegisterIoCDependencyCollision().Execute();
         new RegisterIoCDependencyTorpedo().Execute();
         new RegisterIoCDependencyFireCommand().Execute();
 
@@ -119,7 +127,7 @@ public class FireCommandTests
 
         Ioc.Resolve<App.ICommand>(
             "IoC.Register",
-            "Commands.Move",
+            "Macro.Move",
             (object[] _) => moveOperation
         ).Execute();
 
