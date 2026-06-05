@@ -37,4 +37,10 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="CollisionData\point.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -28,7 +28,7 @@ public class FireCommand(
         IDictionary<string, object> order = new Dictionary<string, object>
         {
             { "target", torpedo },
-            { "command", "Commands.Move" },
+            { "command", "Macro.Move" },
             { "receiver", receiver },
         };
 
